@@ -3,990 +3,1232 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Team Visual Mood Canvas</title>
+    <title>Team Mood Canvas</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #f8fafc; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #1f2937;
+        }
         .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
-        .header { text-align: center; margin-bottom: 32px; }
-        .title { font-size: 2rem; font-weight: bold; color: #1f2937; margin-bottom: 8px; }
-        .subtitle { color: #6b7280; }
-        .card { background: white; border-radius: 8px; padding: 24px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .textarea { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 14px; resize: vertical; }
-        .btn { padding: 12px 24px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; margin-right: 8px; }
-        .btn:hover { background: #2563eb; }
-        .btn-purple { background: #6366f1; }
-        .btn-purple:hover { background: #5b21b6; }
-        .btn-green { background: #10b981; }
-        .btn-green:hover { background: #059669; }
+        .header { 
+            text-align: center; 
+            margin-bottom: 32px; 
+            background: rgba(255, 255, 255, 0.95);
+            padding: 24px;
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        .title { 
+            font-size: 2.5rem; 
+            font-weight: 700; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px; 
+        }
+        .subtitle { color: #6b7280; font-size: 1.1rem; margin-bottom: 20px; }
+        .stats-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); 
+            gap: 16px; 
+            margin-top: 20px; 
+        }
+        .stat-card { 
+            background: rgba(255, 255, 255, 0.1); 
+            padding: 16px; 
+            border-radius: 12px; 
+            text-align: center;
+            backdrop-filter: blur(5px);
+        }
+        .stat-number { font-size: 2rem; font-weight: bold; color: #1f2937; }
+        .stat-label { font-size: 0.9rem; color: #6b7280; margin-top: 4px; }
+        .card { 
+            background: rgba(255, 255, 255, 0.95); 
+            border-radius: 16px; 
+            padding: 24px; 
+            margin-bottom: 24px; 
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        .textarea { 
+            width: 100%; 
+            padding: 16px; 
+            border: 2px solid #e5e7eb; 
+            border-radius: 12px; 
+            font-size: 16px; 
+            resize: vertical; 
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+        .textarea:focus { border-color: #667eea; outline: none; }
+        .btn { 
+            padding: 16px 32px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; 
+            border: none; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
         .flex { display: flex; }
         .justify-between { justify-content: space-between; }
         .items-center { align-items: center; }
         .mt-4 { margin-top: 16px; }
         .mb-4 { margin-bottom: 16px; }
-        .text-sm { font-size: 14px; }
-        .text-gray { color: #6b7280; }
-        .canvas { border: 1px solid #e5e7eb; border-radius: 6px; max-width: 100%; }
-        .nav-btn { padding: 8px 16px; margin-right: 8px; border: none; border-radius: 6px; cursor: pointer; }
-        .nav-active { background: #3b82f6; color: white; }
-        .nav-inactive { background: #e5e7eb; color: #374151; }
-        .submission { background: #f9fafb; padding: 16px; border-radius: 6px; margin-bottom: 12px; }
-        .avatar { width: 32px; height: 32px; background: #3b82f6; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; font-weight: bold; }
-        .mood-tag { background: #e5e7eb; padding: 4px 8px; border-radius: 12px; font-size: 12px; margin-left: 8px; }
         .hidden { display: none !important; }
-        .success { background: #d1fae5; color: #065f46; padding: 12px; border-radius: 6px; margin-bottom: 16px; }
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: none; }
-        .modal-content { background: white; border-radius: 8px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; padding: 24px; margin: 50px auto; }
-        .close-btn { float: right; font-size: 24px; background: none; border: none; cursor: pointer; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px; }
-        .stat-card { background: #f8fafc; padding: 16px; border-radius: 6px; text-align: center; }
-        .stat-number { font-size: 24px; font-weight: bold; color: #1f2937; }
-        .stat-label { font-size: 14px; color: #6b7280; margin-top: 4px; }
-        .submissions-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; max-height: 400px; overflow-y: auto; }
-        .team-counter { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 20px; border-radius: 8px; text-align: center; margin-bottom: 16px; }
-        .progress-bar { width: 100%; height: 8px; background: #e5e7eb; border-radius: 4px; overflow: hidden; margin-top: 8px; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, #10b981, #3b82f6); transition: width 0.3s ease; }
-        .name-input { width: 200px; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px; margin-right: 12px; }
-        .vibrant-boost { animation: pulseGlow 2s ease-in-out infinite; }
-        @keyframes pulseGlow { 
-            0%, 100% { filter: brightness(1) saturate(1); }
-            50% { filter: brightness(1.3) saturate(1.5); }
+        .success { 
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white; 
+            padding: 16px; 
+            border-radius: 12px; 
+            margin-bottom: 16px;
+            text-align: center;
+            font-weight: 500;
+        }
+        .art-display { 
+            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            border-radius: 16px; 
+            padding: 32px; 
+            text-align: center;
+            color: white;
+        }
+        .art-frame { 
+            border: 3px solid #e5e7eb; 
+            border-radius: 12px; 
+            padding: 12px; 
+            background: white; 
+            margin: 16px auto; 
+            display: inline-block;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .quick-actions { 
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+        .quick-btn { 
+            padding: 8px 16px;
+            background: rgba(102, 126, 234, 0.1);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            color: #667eea;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        .quick-btn:hover { background: rgba(102, 126, 234, 0.2); }
+        .nav-btn { 
+            padding: 12px 24px; 
+            margin-right: 12px; 
+            border: none; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .nav-active { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; 
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .nav-inactive { 
+            background: rgba(255, 255, 255, 0.7); 
+            color: #374151; 
+            backdrop-filter: blur(5px);
+        }
+        .nav-inactive:hover { background: rgba(255, 255, 255, 0.9); }
+        .submission { 
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            padding: 20px; 
+            border-radius: 12px; 
+            margin-bottom: 16px;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+        .avatar { 
+            width: 40px; 
+            height: 40px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            margin-right: 16px; 
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .mood-tag { 
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            padding: 6px 12px; 
+            border-radius: 20px; 
+            font-size: 12px; 
+            font-weight: 500;
+            margin-left: 12px;
+        }
+        .gallery-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); 
+            gap: 24px; 
+        }
+        .gallery-item { 
+            background: rgba(255, 255, 255, 0.9);
+            padding: 24px; 
+            border-radius: 16px; 
+            border-left: 4px solid; 
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .gallery-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+        .team-weather { 
+            background: rgba(255, 255, 255, 0.1);
+            padding: 16px;
+            border-radius: 12px;
+            margin: 16px 0;
+            backdrop-filter: blur(5px);
+        }
+        .weather-emoji { font-size: 2rem; margin-right: 12px; }
+        .team-vibe { 
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 24px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        .vibe-meter { 
+            width: 100%;
+            height: 12px;
+            background: #e5e7eb;
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 12px 0;
+        }
+        .vibe-fill { 
+            height: 100%;
+            background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+            transition: width 0.3s ease;
+        }
+        .energy-pulse { 
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1 class="title">🎨 Team Visual Mood Canvas</h1>
-            <p class="subtitle">Transform feelings into collaborative art</p>
-            <div class="team-counter">
-                <div class="stat-number" id="teamCount">0</div>
-                <div class="stat-label">Team Members Responded</div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            <h1 class="title">🎨 Team Mood Canvas</h1>
+            <p class="subtitle">Transform your energy into art, connect with your team's vibe</p>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="teamCount">0</div>
+                    <div class="stat-label">Artworks</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="avgEnergy">0</div>
+                    <div class="stat-label">Avg Energy</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="topMood">-</div>
+                    <div class="stat-label">Team Vibe</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="streakCount">0</div>
+                    <div class="stat-label">Day Streak</div>
                 </div>
             </div>
         </div>
 
-        <div id="navigation" class="hidden mb-4">
-            <button class="nav-btn nav-active" onclick="showView('submit')">Submit New Mood</button>
-            <button class="nav-btn nav-inactive" onclick="showView('visual')">Your Visual</button>
-            <button class="nav-btn nav-inactive" onclick="showView('team')">Team Canvas</button>
-            <button class="nav-btn nav-inactive" onclick="resetSession()" style="background: #ef4444; margin-left: 16px;">🔄 Reset Session</button>
+        <div id="navigation" class="hidden mb-4" style="text-align: center; margin-bottom: 24px;">
+            <button class="nav-btn nav-active" onclick="showView('create')">Create Art</button>
+            <button class="nav-btn nav-inactive" onclick="showView('team')">Team Gallery</button>
+            <button class="nav-btn nav-inactive" onclick="showView('insights')">Team Insights</button>
+            <button class="nav-btn" onclick="resetSession()" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; margin-left: 16px;">🔄 Reset</button>
         </div>
 
-        <div id="submitView">
+        <div id="createView">
             <div class="card">
-                <h2 class="mb-4">How are you feeling today?</h2>
-                <textarea id="moodInput" class="textarea" rows="4" placeholder="Share your current mood... Try examples like:
-• 'excited about the new project!'
-• 'no complaints, things are going well'
-• 'feeling creative and inspired'
-• 'a bit overwhelmed but motivated'
-• 'energized and ready to tackle challenges'
-• 'collaborative and connected with the team'"></textarea>
+                <h2 class="mb-4">How's your energy today?</h2>
+                <textarea id="moodInput" class="textarea" rows="4" placeholder="Share your current vibe... Try:
+• 'Feeling triumphant after that client win!'
+• 'Energized and ready to tackle implementation'
+• 'Creative flow - inspired by new possibilities'
+• 'Collaborative mood - loving the team sync energy'
+• 'Focused determination for complex deliverables'"></textarea>
+                
                 <div class="flex justify-between items-center mt-4">
-                    <span class="text-sm text-gray">Your words will become colors and shapes</span>
-                    <button class="btn" onclick="submitMood()">✨ Create Visual</button>
+                    <div class="quick-actions">
+                        <button class="quick-btn" onclick="addQuickMood('triumphant after the big win')">🏆 Triumphant</button>
+                        <button class="quick-btn" onclick="addQuickMood('energized and ready for action')">⚡ Energized</button>
+                        <button class="quick-btn" onclick="addQuickMood('creatively inspired and flowing')">🎨 Creative</button>
+                        <button class="quick-btn" onclick="addQuickMood('focused on implementation')">🎯 Focused</button>
+                        <button class="quick-btn" onclick="addQuickMood('collaborative team energy')">🤝 Collaborative</button>
+                        <button class="quick-btn" onclick="addQuickMood('tranquil and centered')">🌊 Tranquil</button>
+                    </div>
+                    <button class="btn energy-pulse" onclick="generateArt()">🎨 Create My Art</button>
                 </div>
             </div>
 
-            <div class="card">
-                <h3 class="mb-4">Recent Team Submissions</h3>
-                <div class="submissions-grid" id="submissionsList"></div>
-            </div>
-        </div>
-
-        <div id="visualView" class="hidden">
             <div id="successMessage" class="success hidden">
-                🎉 Your mood visual has been created! 
+                🎉 Your energy has been transformed into art! Check out what your team might vibe with today.
             </div>
             
             <div class="card">
-                <div class="flex justify-between items-center mb-4">
-                    <h2>Your Mood Visual</h2>
-                    <div>
-                        <button class="btn btn-purple" onclick="showGuide()">⭐ Visual Guide</button>
-                        <button class="btn btn-green" onclick="downloadCanvas('moodCanvas')">💾 Download</button>
-                    </div>
+                <h2 class="mb-4">Your Mood Artwork</h2>
+                <div id="artDisplay">
+                    <p style="text-align: center; color: #6b7280; padding: 40px;">
+                        Create your first artwork to see your energy transformed into visual art!
+                    </p>
                 </div>
-                <canvas id="moodCanvas" class="canvas" width="800" height="500"></canvas>
             </div>
 
             <div class="card">
-                <h3 class="mb-4">Your Mood Analysis</h3>
-                <div id="analysisDisplay"></div>
+                <h3 class="mb-4">Artistic Analysis</h3>
+                <div id="analysisDisplay">
+                    <p style="text-align: center; color: #6b7280; padding: 20px;">
+                        Analysis will appear here after creating artwork.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="mb-4">Recent Team Energy</h3>
+                <div id="teamWeather" class="team-weather hidden">
+                    <div class="flex items-center">
+                        <span class="weather-emoji" id="weatherEmoji">☀️</span>
+                        <div>
+                            <div style="font-weight: 600; font-size: 18px;" id="weatherDescription">Sunny Team Vibes</div>
+                            <div style="font-size: 14px; opacity: 0.8;" id="weatherDetails">High energy, creative collaboration</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="submissionsList"></div>
             </div>
         </div>
 
         <div id="teamView" class="hidden">
-            <div class="card">
-                <div class="flex justify-between items-center mb-4">
-                    <h2>Combined Team Canvas</h2>
-                    <div>
-                        <button class="btn btn-purple" onclick="showGuide()">⭐ Visual Guide</button>
-                        <button class="btn btn-green" onclick="downloadCanvas('teamCanvas')">💾 Download</button>
-                    </div>
+            <div class="team-vibe">
+                <h3 style="margin-bottom: 16px;">Team Energy Pulse</h3>
+                <div id="vibeDescription">Loading team vibe...</div>
+                <div class="vibe-meter">
+                    <div class="vibe-fill" id="vibeFill" style="width: 0%"></div>
                 </div>
-                <canvas id="teamCanvas" class="canvas" width="1000" height="650"></canvas>
+                <div id="collaborationHints"></div>
             </div>
 
             <div class="card">
-                <h3 class="mb-4">Team Mood Analysis</h3>
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-number" id="avgIntensity">0</div>
-                        <div class="stat-label">Average Energy</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="topMood">-</div>
-                        <div class="stat-label">Dominant Mood</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="responseRate">0%</div>
-                        <div class="stat-label">Response Rate</div>
-                    </div>
-                </div>
-                <div id="teamAnalysisDisplay"></div>
-            </div>
-
-            <div class="card">
-                <h3 class="mb-4">All Team Submissions</h3>
-                <div class="submissions-grid" id="allSubmissionsList"></div>
+                <h2 class="mb-4">Team Art Gallery</h2>
+                <div id="teamGallery"></div>
             </div>
         </div>
-    </div>
 
-    <!-- Visual Guide Modal -->
-    <div id="guideModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeGuide()">&times;</button>
-            <h2 style="margin-bottom: 24px;">🎨 Visual Guide</h2>
-
-            <div style="margin-bottom: 24px;">
-                <h3 style="font-weight: bold; margin-bottom: 12px;">Shape Meanings</h3>
-                <div class="grid-2">
-                    <div class="flex items-center">
-                        <div style="width: 16px; height: 16px; background: #3b82f6; border-radius: 50%; margin-right: 8px;"></div>
-                        <span class="text-sm">Circles = Harmony, Peace</span>
-                    </div>
-                    <div class="flex items-center">
-                        <span style="color: #f59e0b; margin-right: 8px;">⭐</span>
-                        <span class="text-sm">Stars = Excellence, Energy</span>
-                    </div>
-                    <div class="flex items-center">
-                        <span style="color: #ef4444; margin-right: 8px;">❤️</span>
-                        <span class="text-sm">Hearts = Connection, Joy</span>
-                    </div>
-                    <div class="flex items-center">
-                        <span style="color: #8b5cf6; margin-right: 8px;">🌀</span>
-                        <span class="text-sm">Spirals = Creativity, Growth</span>
-                    </div>
-                    <div class="flex items-center">
-                        <span style="color: #059669; margin-right: 8px;">▲</span>
-                        <span class="text-sm">Triangles = Challenge, Progress</span>
-                    </div>
-                    <div class="flex items-center">
-                        <div style="width: 16px; height: 16px; background: #6b7280; margin-right: 8px;"></div>
-                        <span class="text-sm">Squares = Stability, Focus</span>
-                    </div>
-                </div>
-            </div>
-
-            <div style="margin-bottom: 24px;">
-                <h3 style="font-weight: bold; margin-bottom: 12px;">Color Psychology</h3>
-                <div style="margin-bottom: 12px;">
-                    <div class="flex items-center" style="margin-bottom: 8px;">
-                        <div class="flex" style="margin-right: 12px;">
-                            <div style="width: 12px; height: 12px; background: #ef4444; border-radius: 50%; margin-right: 4px;"></div>
-                            <div style="width: 12px; height: 12px; background: #f59e0b; border-radius: 50%; margin-right: 4px;"></div>
-                            <div style="width: 12px; height: 12px; background: #eab308; border-radius: 50%;"></div>
-                        </div>
-                        <span class="text-sm"><strong>Warm Colors:</strong> Energy, Excitement, Positivity</span>
-                    </div>
-                    <div class="flex items-center">
-                        <div class="flex" style="margin-right: 12px;">
-                            <div style="width: 12px; height: 12px; background: #3b82f6; border-radius: 50%; margin-right: 4px;"></div>
-                            <div style="width: 12px; height: 12px; background: #06b6d4; border-radius: 50%; margin-right: 4px;"></div>
-                            <div style="width: 12px; height: 12px; background: #10b981; border-radius: 50%;"></div>
-                        </div>
-                        <span class="text-sm"><strong>Cool Colors:</strong> Calm, Stability, Focus</span>
-                    </div>
-                </div>
-            </div>
-
-            <div style="margin-bottom: 24px;">
-                <h3 style="font-weight: bold; margin-bottom: 12px;">Team Energy Effects</h3>
-                <div class="text-sm" style="line-height: 1.6;">
-                    <p style="margin-bottom: 8px;"><strong>5-10 responses:</strong> Soft, flowing patterns</p>
-                    <p style="margin-bottom: 8px;"><strong>10-15 responses:</strong> Increased vibrancy and density</p>
-                    <p style="margin-bottom: 8px;"><strong>15-20 responses:</strong> Dynamic, energetic compositions</p>
-                    <p style="margin-bottom: 8px;"><strong>20+ responses:</strong> Explosive, celebration-like visuals</p>
-                </div>
-            </div>
-
-            <div>
-                <h3 style="font-weight: bold; margin-bottom: 12px;">Mood Categories</h3>
-                <div class="grid-2 text-sm">
-                    <div><strong>Positive:</strong> excited, energized, thrilled</div>
-                    <div><strong>Calm:</strong> peaceful, content, balanced</div>
-                    <div><strong>Creative:</strong> innovative, inspired, artistic</div>
-                    <div><strong>Collaborative:</strong> connected, supported, unified</div>
-                    <div><strong>Challenged:</strong> determined, focused, resilient</div>
-                    <div><strong>Reflective:</strong> thoughtful, contemplative, wise</div>
-                </div>
+        <div id="insightsView" class="hidden">
+            <div class="card">
+                <h2 class="mb-4">Team Insights Dashboard</h2>
+                <div id="insightsDisplay"></div>
             </div>
         </div>
     </div>
 
     <script>
-        let currentView = 'submit';
         let teamSubmissions = [];
-        const MAX_TEAM_SIZE = 25;
-        const STORAGE_KEY = 'teamMoodSubmissions';
-
-        // Load data from localStorage with cross-tab sync
-        function loadSubmissions() {
-            try {
-                const saved = localStorage.getItem(STORAGE_KEY);
-                if (saved) {
-                    teamSubmissions = JSON.parse(saved);
-                } else {
-                    teamSubmissions = [];
-                }
-            } catch (e) {
-                console.log('localStorage not available, using memory only');
-                teamSubmissions = [];
-            }
-        }
-
-        // Save data to localStorage for cross-tab sharing
-        function saveSubmissions() {
-            try {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(teamSubmissions));
-                // Trigger storage event for other tabs
-                window.dispatchEvent(new StorageEvent('storage', {
-                    key: STORAGE_KEY,
-                    newValue: JSON.stringify(teamSubmissions)
-                }));
-            } catch (e) {
-                console.log('localStorage not available');
-            }
-        }
-
-        // Listen for changes from other tabs
-        window.addEventListener('storage', function(e) {
-            if (e.key === STORAGE_KEY) {
-                loadSubmissions();
-                updateTeamCounter();
-                renderSubmissions();
-                
-                // Update team canvas if visible
-                if (!document.getElementById('teamView').classList.contains('hidden')) {
-                    setTimeout(() => {
-                        const canvas = document.getElementById('teamCanvas');
-                        if (canvas) {
-                            drawCombinedVisual(teamSubmissions, canvas);
-                            updateTeamAnalysis();
-                        }
-                    }, 100);
-                }
-            }
-        });
-
-        // Initialize data
-        function initializeData() {
-            loadSubmissions();
-            // If no data exists, don't add sample data - start fresh
-        }
-
-        function updateTeamCounter() {
-            const count = teamSubmissions.length;
-            const percentage = Math.min((count / MAX_TEAM_SIZE) * 100, 100);
-            
-            document.getElementById('teamCount').textContent = count;
-            document.getElementById('progressFill').style.width = percentage + '%';
-            
-            if (count >= 15) {
-                document.querySelector('.team-counter').classList.add('vibrant-boost');
-            }
-        }
 
         function analyzeMood(text) {
             const lower = text.toLowerCase();
-            let mood = 'calm';
+            let mood = 'balanced';
             let intensity = 5;
+            let palette = ['#6366f1', '#8b5cf6', '#d946ef'];
+            let style = 'flowing';
 
-            // Check for positive moods first - expanded list
-            if (lower.includes('excited') || lower.includes('thrilled') || lower.includes('energized') || 
-                lower.includes('amazing') || lower.includes('fantastic') || lower.includes('great!') || 
-                lower.includes('awesome') || lower.includes('excellent') || lower.includes('wonderful') ||
-                lower.includes('outstanding') || lower.includes('superb') || lower.includes('brilliant') ||
-                lower.includes('incredible') || lower.includes('marvelous') || lower.includes('terrific') ||
-                lower.includes('fabulous') || lower.includes('phenomenal') || lower.includes('spectacular')) {
-                mood = 'positive';
+            // Enhanced mood detection with better keyword matching
+            if (lower.includes('caffeine') || lower.includes('coffee') || lower.includes('caffeinated') || lower.includes('powered') || lower.includes('jittery')) {
+                mood = 'caffeinated';
+                palette = ['#92400e', '#78350f', '#f5f5f4', '#fef3c7']; // Coffee browns
+                style = 'jittery';
                 intensity = 8;
-            } 
-            // Check for creative moods
-            else if (lower.includes('creative') || lower.includes('innovative') || lower.includes('inspired') || lower.includes('artistic')) {
-                mood = 'creative';
+            } else if (lower.includes('uplifting') || lower.includes('hopeful') || lower.includes('optimistic') || lower.includes('bright') || lower.includes('positive') || lower.includes('sunny')) {
+                mood = 'uplifting';
+                palette = ['#fbbf24', '#f59e0b', '#d97706', '#92400e']; // Yellow/amber spectrum
+                style = 'radiant';
+                intensity = 6;
+            } else if (lower.includes('triumphant') || lower.includes('victory') || lower.includes('winning') || lower.includes('achieved') || lower.includes('accomplished') || 
+                (lower.includes('client') && (lower.includes('win') || lower.includes('success') || lower.includes('happy')))) {
+                mood = 'triumphant';
+                palette = ['#10b981', '#059669', '#047857', '#065f46']; // Green spectrum
+                style = 'celebratory';
+                intensity = 9;
+            } else if (lower.includes('implementation') || lower.includes('delivery') || lower.includes('focused') || lower.includes('methodical') || lower.includes('systematic')) {
+                mood = 'focused';
+                palette = ['#3b82f6', '#1d4ed8', '#1e40af', '#94a3b8']; // Blue spectrum
+                style = 'structured';
                 intensity = 7;
-            } 
-            // Check for challenging/negative moods - expanded detection
-            else if (lower.includes('overwhelmed') || lower.includes('stressed') || lower.includes('tough') || lower.includes('challenging') || 
-                     lower.includes('not great') || lower.includes('difficult') || lower.includes('struggling') || lower.includes('frustrated') ||
-                     lower.includes('tired') || lower.includes('exhausted') || lower.includes('rough') || lower.includes('hard') ||
-                     lower.includes('bad') || lower.includes('awful') || lower.includes('terrible') || lower.includes('not good') ||
-                     lower.includes('busy') || lower.includes('hectic') || lower.includes('swamped') || lower.includes('rushing') ||
-                     lower.includes('chaotic') || lower.includes('frantic') || lower.includes('slammed') || lower.includes('intense')) {
-                mood = 'challenged';
-                intensity = 7; // Busy states are high intensity
-            } 
-            // Check for collaborative moods
-            else if (lower.includes('team') || lower.includes('together') || lower.includes('supported') || lower.includes('connected') || lower.includes('collaborative')) {
-                mood = 'collaborative';
+            } else if (lower.includes('excited') || lower.includes('energized') || lower.includes('thrilled') || lower.includes('amazing') || lower.includes('action') || lower.includes('dynamic')) {
+                mood = 'energetic';
+                palette = ['#f59e0b', '#ef4444', '#dc2626', '#fb923c']; // Orange/red spectrum
+                style = 'dynamic';
+                intensity = 8;
+            } else if (lower.includes('creative') || lower.includes('innovative') || lower.includes('inspired') || lower.includes('artistic') || lower.includes('abstract')) {
+                mood = 'creative';
+                palette = ['#8b5cf6', '#ec4899', '#06b6d4', '#f59e0b']; // Purple/pink spectrum
+                style = 'abstract';
+                intensity = 7;
+            } else if (lower.includes('overwhelmed') || lower.includes('stressed') || lower.includes('chaotic') || lower.includes('intense') || lower.includes('turbulent')) {
+                mood = 'turbulent';
+                palette = ['#374151', '#7c2d12', '#94a3b8', '#b45309']; // Gray/brown spectrum
+                style = 'stormy';
+                intensity = 8;
+            } else if (lower.includes('calm') || lower.includes('peaceful') || lower.includes('serene') || lower.includes('centered') || lower.includes('tranquil')) {
+                mood = 'tranquil';
+                palette = ['#06b6d4', '#0891b2', '#0e7490', '#155e75']; // Cyan spectrum
+                style = 'gentle';
+                intensity = 3;
+            } else if (lower.includes('collaborative') || lower.includes('connected') || lower.includes('together') || lower.includes('team') || lower.includes('harmonious')) {
+                mood = 'harmonious';
+                palette = ['#10b981', '#059669', '#047857', '#065f46']; // Green spectrum
+                style = 'interconnected';
                 intensity = 6;
-            } 
-            // Check for reflective/focused moods
-            else if (lower.includes('thoughtful') || lower.includes('reflective') || lower.includes('contemplating') || lower.includes('processing') ||
-                     lower.includes('focused') || lower.includes('concentrating') || lower.includes('determined') || lower.includes('steady') ||
-                     lower.includes('methodical') || lower.includes('disciplined') || lower.includes('organized') || lower.includes('structured')) {
-                mood = 'reflective';
-                intensity = 6;
-            }
-            // Check for calm/peaceful moods
-            else if (lower.includes('peaceful') || lower.includes('calm') || lower.includes('balanced') || lower.includes('content') || 
-                     lower.includes('fine') || lower.includes('okay') || lower.includes('good') || lower.includes('no complaints') ||
-                     lower.includes('relaxed') || lower.includes('chill') || lower.includes('serene')) {
-                mood = 'calm';
+            } else if (lower.includes('reflective') || lower.includes('thoughtful') || lower.includes('contemplative') || lower.includes('processing') || lower.includes('meditative')) {
+                mood = 'contemplative';
+                palette = ['#6b7280', '#4b5563', '#374151', '#1f2937']; // Gray spectrum
+                style = 'meditative';
                 intensity = 4;
-            }
-
-            // Special handling for repetitive words (busy busy busy, etc.)
-            const repetitionMatch = text.match(/\b(\w+)(?:\s*,?\s*\1)+/gi);
-            if (repetitionMatch) {
-                intensity = Math.min(10, intensity + 2); // Repetition shows emphasis/intensity
+            } else if (lower.includes('ok') || lower.includes('okay') || lower.includes('fine') || lower.includes('alright') || lower.includes('doing well')) {
+                // Handle neutral expressions that should still get some visual interest
+                mood = 'balanced';
+                palette = ['#6366f1', '#8b5cf6', '#d946ef', '#06b6d4']; // More vibrant balanced palette
+                style = 'flowing';
+                intensity = 5;
             }
 
             // Intensity modifiers
-            if (lower.includes('!') || lower.includes('really') || lower.includes('super') || lower.includes('extremely')) {
+            if (lower.includes('!') || lower.includes('really') || lower.includes('extremely') || lower.includes('incredibly')) {
                 intensity = Math.min(10, intensity + 2);
             }
             if (lower.includes('very') || lower.includes('quite') || lower.includes('pretty')) {
                 intensity = Math.min(10, intensity + 1);
             }
-            // Reduce intensity for "not" phrases
-            if (lower.includes('not great') || lower.includes('not good') || lower.includes('not well')) {
-                intensity = Math.max(3, intensity - 1);
-            }
 
-            const colorPalettes = {
-                positive: ['#FF6B6B', '#FFD93D', '#6BCF7F', '#FF8E53', '#FF6B9D'],
-                calm: ['#74B9FF', '#81ECEC', '#00B894', '#55A3FF', '#6C5CE7'],
-                creative: ['#9B59B6', '#E91E63', '#FF5722', '#8E44AD', '#E74C3C'],
-                challenged: ['#E74C3C', '#F39C12', '#E67E22', '#D35400', '#C0392B'],
-                collaborative: ['#3498DB', '#2ECC71', '#F1C40F', '#1ABC9C', '#9B59B6'],
-                reflective: ['#95A5A6', '#34495E', '#7F8C8D', '#2C3E50', '#BDC3C7']
-            };
+            // Debug logging
+            console.log(`Input: "${text}" → Mood: ${mood}, Style: ${style}, Intensity: ${intensity}`);
 
-            return {
-                colors: colorPalettes[mood] || colorPalettes.calm,
-                mood: mood,
-                intensity: intensity
-            };
+            return { mood, intensity, palette, style };
         }
 
-        function getVibrancyMultiplier() {
-            const count = teamSubmissions.length;
-            if (count >= 20) return 2.5;
-            if (count >= 15) return 2.0;
-            if (count >= 10) return 1.5;
-            if (count >= 5) return 1.2;
-            return 1.0;
-        }
-
-        function drawVisual(visual, canvas) {
-            const ctx = canvas.getContext('2d');
-            const width = canvas.width;
-            const height = canvas.height;
+        function createArtwork(analysis, text) {
+            const { mood, intensity, palette, style } = analysis;
+            const width = 400;
+            const height = 300;
             
-            ctx.clearRect(0, 0, width, height);
+            let svg = `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">`;
             
-            const vibrancy = getVibrancyMultiplier();
+            // Enhanced background with multiple gradients
+            const gradientId = `bg-${Date.now()}`;
+            svg += `<defs>
+                <radialGradient id="${gradientId}" cx="50%" cy="50%" r="70%">
+                    <stop offset="0%" style="stop-color:${palette[0]};stop-opacity:0.4"/>
+                    <stop offset="30%" style="stop-color:${palette[1]};stop-opacity:0.3"/>
+                    <stop offset="70%" style="stop-color:${palette[2]};stop-opacity:0.2"/>
+                    <stop offset="100%" style="stop-color:${palette[3] || palette[0]};stop-opacity:0.1"/>
+                </radialGradient>
+            </defs>`;
             
-            // Enhanced background with more layers
-            for (let layer = 0; layer < 3; layer++) {
-                const gradient = ctx.createRadialGradient(
-                    width/2 + (layer * 50), height/2 + (layer * 30), 0, 
-                    width/2, height/2, Math.max(width, height)/2
-                );
-                gradient.addColorStop(0, visual.colors[layer % visual.colors.length] + Math.floor(40 * vibrancy).toString(16).padStart(2, '0'));
-                gradient.addColorStop(0.5, visual.colors[(layer + 1) % visual.colors.length] + Math.floor(20 * vibrancy).toString(16).padStart(2, '0'));
-                gradient.addColorStop(1, visual.colors[(layer + 2) % visual.colors.length] + '10');
-                ctx.fillStyle = gradient;
-                ctx.fillRect(0, 0, width, height);
-            }
-
-            // Draw enhanced shapes
-            const shapeCount = Math.max(12, visual.intensity * 3 * vibrancy);
-            const centerX = width / 2;
-            const centerY = height / 2;
+            svg += `<rect width="100%" height="100%" fill="url(#${gradientId})"/>`;
             
-            for (let i = 0; i < shapeCount; i++) {
-                let x, y;
-                if (i < shapeCount * 0.7) {
-                    const angle = (i / shapeCount) * Math.PI * 2;
-                    const distance = (40 + Math.random() * 120) * (visual.intensity / 8) * vibrancy;
-                    x = centerX + Math.cos(angle) * distance;
-                    y = centerY + Math.sin(angle) * distance;
-                } else {
-                    x = Math.random() * width;
-                    y = Math.random() * height;
-                }
+            // Enhanced artwork generation matching mood board PNG patterns exactly
+            if (style === 'celebratory') {
+                // Triumphant - Fireworks pattern like mood board
+                const centerX = width / 2;
+                const centerY = height / 2;
                 
-                const size = (25 + Math.random() * 60) * (visual.intensity / 8) * vibrancy;
-                const color = visual.colors[Math.floor(Math.random() * visual.colors.length)];
-                
-                ctx.fillStyle = color;
-                ctx.globalAlpha = 0.6 + (visual.intensity / 25) + (vibrancy * 0.1);
-                
-                drawMoodShape(ctx, x, y, size, visual.mood);
-            }
-            
-            ctx.globalAlpha = 1;
-        }
-
-        function drawCombinedVisual(submissions, canvas) {
-            const ctx = canvas.getContext('2d');
-            const width = canvas.width;
-            const height = canvas.height;
-            
-            ctx.clearRect(0, 0, width, height);
-            
-            const vibrancy = getVibrancyMultiplier();
-            const totalSubmissions = submissions.length;
-            
-            // Group submissions by mood for clustering
-            const moodGroups = {};
-            submissions.forEach(submission => {
-                const mood = submission.visual.mood;
-                if (!moodGroups[mood]) {
-                    moodGroups[mood] = [];
-                }
-                moodGroups[mood].push(submission);
-            });
-
-            // Calculate mood popularity and positions
-            const moodStats = Object.entries(moodGroups).map(([mood, subs]) => ({
-                mood,
-                submissions: subs,
-                count: subs.length,
-                avgIntensity: subs.reduce((sum, s) => sum + s.visual.intensity, 0) / subs.length,
-                popularity: subs.length / totalSubmissions
-            })).sort((a, b) => b.count - a.count);
-
-            // Create clean, modern background instead of murky "bath water"
-            const backgroundLayers = Math.min(3, moodStats.length);
-            for (let layer = 0; layer < backgroundLayers; layer++) {
-                const moodIndex = layer % moodStats.length;
-                const moodStat = moodStats[moodIndex];
-                const colors = moodStat.submissions[0].visual.colors;
-                
-                // Create clean geometric patterns instead of flowing waves
-                const gradient = ctx.createRadialGradient(
-                    width * (0.3 + layer * 0.2), 
-                    height * (0.3 + layer * 0.2), 
-                    0,
-                    width * (0.3 + layer * 0.2), 
-                    height * (0.3 + layer * 0.2), 
-                    Math.max(width, height) * (0.4 + layer * 0.1)
-                );
-                
-                const alpha = Math.max(5, Math.floor(8 + moodStat.popularity * 12));
-                gradient.addColorStop(0, colors[0] + alpha.toString(16).padStart(2, '0'));
-                gradient.addColorStop(0.7, colors[1] + '05');
-                gradient.addColorStop(1, 'transparent');
-                
-                ctx.fillStyle = gradient;
-                ctx.fillRect(0, 0, width, height);
-            }
-
-            const centerX = width / 2;
-            const centerY = height / 2;
-            
-            // Create flowing energy constellation instead of static clusters
-            moodStats.forEach((moodStat, moodIndex) => {
-                const ringRadius = moodIndex === 0 ? 0 : (60 + moodIndex * 100);
-                const baseAngle = (moodIndex * Math.PI * 1.618) / moodStats.length;
-                
-                let clusterX, clusterY;
-                if (moodIndex === 0) {
-                    clusterX = centerX;
-                    clusterY = centerY;
-                } else {
-                    const angle = baseAngle + (moodIndex * 2 * Math.PI / Math.max(1, moodStats.length - 1));
-                    clusterX = centerX + Math.cos(angle) * ringRadius;
-                    clusterY = centerY + Math.sin(angle) * ringRadius;
-                }
-
-                // Create dynamic, flowing shape clusters
-                const totalShapes = Math.max(20, Math.floor(moodStat.avgIntensity * moodStat.count * 2.5));
-                const popularityMultiplier = 0.8 + (moodStat.popularity * 2.2);
-                
-                // Create flowing, organic patterns instead of rigid circles
-                for (let constellation = 0; constellation < 3; constellation++) {
-                    const shapesInConstellation = Math.floor(totalShapes / 3);
-                    const constellationRadius = 40 + constellation * 30 + moodStat.popularity * 40;
-                    const flowOffset = constellation * Math.PI * 0.667; // 120-degree offset
+                // Create radiating firework lines from center
+                for (let i = 0; i < 16; i++) {
+                    const angle = (i / 16) * Math.PI * 2;
+                    const length = 60 + Math.random() * 80;
+                    const x2 = centerX + Math.cos(angle) * length;
+                    const y2 = centerY + Math.sin(angle) * length;
+                    svg += `<line x1="${centerX}" y1="${centerY}" x2="${x2}" y2="${y2}" stroke="${palette[0]}" stroke-width="4" opacity="0.8"/>`;
                     
-                    for (let i = 0; i < shapesInConstellation; i++) {
-                        // Create flowing, spiral-like distribution
-                        const spiralAngle = (i / shapesInConstellation) * Math.PI * 4 + flowOffset;
-                        const spiralRadius = (i / shapesInConstellation) * constellationRadius;
-                        const flowiness = Math.sin(spiralAngle * 0.5) * 20; // Add organic wave motion
-                        
-                        let x = clusterX + Math.cos(spiralAngle) * spiralRadius + flowiness;
-                        let y = clusterY + Math.sin(spiralAngle) * spiralRadius + Math.cos(spiralAngle * 1.3) * 15;
-                        
-                        // Add organic jitter to break up rigid patterns
-                        x += (Math.random() - 0.5) * 25;
-                        y += (Math.random() - 0.5) * 25;
-                        
-                        // Energetic spillover for high vibrancy
-                        if (Math.random() < 0.15 * vibrancy && totalSubmissions >= 8) {
-                            const spillAngle = Math.random() * Math.PI * 2;
-                            const spillDistance = 150 + Math.random() * 200;
-                            x = centerX + Math.cos(spillAngle) * spillDistance;
-                            y = centerY + Math.sin(spillAngle) * spillDistance;
-                        }
-                        
-                        const randomSub = moodStat.submissions[Math.floor(Math.random() * moodStat.submissions.length)];
-                        
-                        // Vary shapes and sizes dramatically to avoid uniformity
-                        const sizeVariation = 0.5 + Math.random() * 1.5; // 50% to 200% size variation
-                        const baseSize = (20 + Math.random() * 50) * (randomSub.visual.intensity / 8);
-                        const size = baseSize * vibrancy * popularityMultiplier * sizeVariation;
-                        
-                        const color = randomSub.visual.colors[Math.floor(Math.random() * randomSub.visual.colors.length)];
-                        
-                        // Vary opacity for depth and avoid flat appearance
-                        const depthAlpha = 0.3 + Math.random() * 0.5 + moodStat.popularity * 0.3;
-                        ctx.globalAlpha = depthAlpha;
-
-                        if (x >= -100 && x <= width + 100 && y >= -100 && y <= height + 100) {
-                            // Mix in some variety - not just the detected shape
-                            const shapeVariety = Math.random();
-                            let shapeToUse = moodStat.mood;
-                            
-                            if (shapeVariety < 0.7) {
-                                // 70% use detected mood shape
-                                shapeToUse = moodStat.mood;
-                            } else if (shapeVariety < 0.85) {
-                                // 15% use circles for flow
-                                shapeToUse = 'calm';
-                            } else {
-                                // 15% use random shape for energy
-                                const shapes = ['positive', 'creative', 'collaborative'];
-                                shapeToUse = shapes[Math.floor(Math.random() * shapes.length)];
-                            }
-                            
-                            // Add glow effects to prominent shapes
-                            if (size > 35 && constellation === 0) {
-                                ctx.shadowColor = color;
-                                ctx.shadowBlur = 8 + Math.random() * 12;
-                                ctx.shadowOffsetX = 0;
-                                ctx.shadowOffsetY = 0;
-                            }
-                            
-                            ctx.fillStyle = color;
-                            drawMoodShape(ctx, x, y, size, shapeToUse);
-                            
-                            ctx.shadowColor = 'transparent';
-                            ctx.shadowBlur = 0;
+                    // Add explosion sparkles at end points
+                    for (let j = 0; j < 4; j++) {
+                        const sparkleX = x2 + (Math.random() - 0.5) * 30;
+                        const sparkleY = y2 + (Math.random() - 0.5) * 30;
+                        svg += `<circle cx="${sparkleX}" cy="${sparkleY}" r="3" fill="${palette[1]}" opacity="0.9"/>`;
+                    }
+                }
+                
+                // Add central victory burst
+                svg += `<circle cx="${centerX}" cy="${centerY}" r="15" fill="${palette[2]}" opacity="0.7"/>`;
+                
+            } else if (style === 'structured') {
+                // Focused - Grid with connecting lines like mood board
+                const gridSize = 40;
+                const gridPoints = [];
+                
+                // Create structured grid points
+                for (let x = gridSize; x < width; x += gridSize) {
+                    for (let y = gridSize; y < height; y += gridSize) {
+                        gridPoints.push({x, y});
+                        svg += `<rect x="${x-8}" y="${y-8}" width="16" height="16" fill="${palette[0]}" opacity="0.7" rx="2"/>`;
+                    }
+                }
+                
+                // Add connecting lines between grid points
+                for (let i = 0; i < gridPoints.length - 1; i++) {
+                    if (Math.random() < 0.3) {
+                        const p1 = gridPoints[i];
+                        const p2 = gridPoints[i + 1];
+                        svg += `<line x1="${p1.x}" y1="${p1.y}" x2="${p2.x}" y2="${p2.y}" stroke="${palette[1]}" stroke-width="2" opacity="0.6"/>`;
+                    }
+                }
+                
+                // Add methodical flow arrows
+                for (let i = 0; i < 5; i++) {
+                    const x = 50 + i * 60;
+                    const y = height / 2;
+                    svg += `<polygon points="${x},${y-8} ${x+16},${y} ${x},${y+8} ${x+4},${y}" fill="${palette[2]}" opacity="0.8"/>`;
+                }
+                
+            } else if (style === 'dynamic') {
+                // Energetic - Radiating lines with energy bursts like mood board
+                const centerX = width / 2;
+                const centerY = height / 2;
+                
+                // Create multiple energy burst centers
+                for (let burst = 0; burst < 3; burst++) {
+                    const burstX = width * (0.2 + burst * 0.3);
+                    const burstY = height * (0.3 + Math.random() * 0.4);
+                    
+                    // Radiating energy lines from each burst
+                    for (let i = 0; i < 12; i++) {
+                        const angle = (i / 12) * Math.PI * 2;
+                        const length = 30 + Math.random() * 60;
+                        const x2 = burstX + Math.cos(angle) * length;
+                        const y2 = burstY + Math.sin(angle) * length;
+                        svg += `<line x1="${burstX}" y1="${burstY}" x2="${x2}" y2="${y2}" stroke="${palette[burst % palette.length]}" stroke-width="3" opacity="0.8"/>`;
+                    }
+                    
+                    // Central energy core
+                    svg += `<circle cx="${burstX}" cy="${burstY}" r="8" fill="${palette[burst % palette.length]}" opacity="0.9"/>`;
+                }
+                
+            } else if (style === 'abstract') {
+                // Creative - Flowing curves and abstract shapes like mood board
+                // Create flowing organic shapes
+                for (let i = 0; i < 5; i++) {
+                    const startX = Math.random() * width;
+                    const startY = Math.random() * height;
+                    const cp1X = Math.random() * width;
+                    const cp1Y = Math.random() * height;
+                    const cp2X = Math.random() * width;
+                    const cp2Y = Math.random() * height;
+                    const endX = Math.random() * width;
+                    const endY = Math.random() * height;
+                    
+                    const path = `M ${startX} ${startY} C ${cp1X} ${cp1Y}, ${cp2X} ${cp2Y}, ${endX} ${endY}`;
+                    svg += `<path d="${path}" stroke="${palette[i % palette.length]}" stroke-width="6" fill="none" opacity="0.7"/>`;
+                }
+                
+                // Add organic blob shapes
+                for (let i = 0; i < 4; i++) {
+                    const cx = Math.random() * width;
+                    const cy = Math.random() * height;
+                    const rx = 20 + Math.random() * 40;
+                    const ry = 15 + Math.random() * 35;
+                    svg += `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${palette[i % palette.length]}" opacity="0.5" transform="rotate(${Math.random() * 360} ${cx} ${cy})"/>`;
+                }
+                
+            } else if (style === 'gentle') {
+                // Tranquil - Flowing water waves and soft bubbles like mood board
+                // Create gentle wave patterns
+                for (let wave = 0; wave < 4; wave++) {
+                    const y = (wave / 4) * height + 30;
+                    const waveHeight = 15 + Math.random() * 10;
+                    let path = `M 0 ${y}`;
+                    
+                    for (let x = 0; x <= width; x += 40) {
+                        const cp1x = x + 13;
+                        const cp1y = y - waveHeight;
+                        const cp2x = x + 27;
+                        const cp2y = y + waveHeight;
+                        const endx = x + 40;
+                        const endy = y;
+                        path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${endx} ${endy}`;
+                    }
+                    
+                    svg += `<path d="${path}" stroke="${palette[wave % palette.length]}" stroke-width="3" fill="none" opacity="0.6"/>`;
+                }
+                
+                // Add floating bubbles
+                for (let i = 0; i < 8; i++) {
+                    const x = Math.random() * width;
+                    const y = Math.random() * height;
+                    const r = 5 + Math.random() * 15;
+                    svg += `<circle cx="${x}" cy="${y}" r="${r}" fill="${palette[i % palette.length]}" opacity="0.4"/>`;
+                }
+                
+            } else if (style === 'interconnected') {
+                // Harmonious - Network nodes and connections like mood board
+                const nodes = [];
+                const nodeCount = 8 + intensity;
+                
+                // Create network nodes
+                for (let i = 0; i < nodeCount; i++) {
+                    nodes.push({
+                        x: 50 + Math.random() * (width - 100),
+                        y: 50 + Math.random() * (height - 100),
+                        size: 8 + Math.random() * 12
+                    });
+                }
+                
+                // Draw connections between nearby nodes
+                for (let i = 0; i < nodes.length; i++) {
+                    for (let j = i + 1; j < nodes.length; j++) {
+                        const distance = Math.sqrt(Math.pow(nodes[i].x - nodes[j].x, 2) + Math.pow(nodes[i].y - nodes[j].y, 2));
+                        if (distance < 120) {
+                            svg += `<line x1="${nodes[i].x}" y1="${nodes[i].y}" x2="${nodes[j].x}" y2="${nodes[j].y}" stroke="${palette[1]}" stroke-width="2" opacity="0.5"/>`;
                         }
                     }
                 }
-            });
-
-            // Add flowing energy streams instead of rigid connections
-            if (vibrancy >= 1.5 && moodStats.length > 1) {
-                ctx.globalAlpha = 0.2;
                 
-                for (let stream = 0; stream < Math.min(8, moodStats.length * 2); stream++) {
-                    const startMood = moodStats[stream % moodStats.length];
-                    const endMood = moodStats[(stream + 1) % moodStats.length];
+                // Draw nodes on top
+                nodes.forEach((node, index) => {
+                    svg += `<circle cx="${node.x}" cy="${node.y}" r="${node.size}" fill="${palette[index % palette.length]}" opacity="0.8"/>`;
+                    svg += `<circle cx="${node.x}" cy="${node.y}" r="${node.size - 3}" fill="white" opacity="0.3"/>`;
+                });
+                
+            } else if (style === 'stormy') {
+                // Turbulent - Chaotic swirling patterns like mood board
+                // Create swirling chaos patterns
+                for (let swirl = 0; swirl < 3; swirl++) {
+                    const centerX = (swirl + 1) * (width / 4);
+                    const centerY = height / 2 + (Math.random() - 0.5) * 100;
                     
-                    const streamGradient = ctx.createLinearGradient(
-                        Math.random() * width, Math.random() * height,
-                        Math.random() * width, Math.random() * height
-                    );
-                    streamGradient.addColorStop(0, startMood.submissions[0].visual.colors[0] + '40');
-                    streamGradient.addColorStop(0.5, endMood.submissions[0].visual.colors[1] + '60');
-                    streamGradient.addColorStop(1, startMood.submissions[0].visual.colors[2] + '20');
-                    
-                    ctx.strokeStyle = streamGradient;
-                    ctx.lineWidth = 2 + Math.random() * 4;
-                    ctx.lineCap = 'round';
-                    
-                    // Create flowing, organic paths
-                    ctx.beginPath();
-                    const startX = centerX + Math.cos(stream) * (80 + stream * 60);
-                    const startY = centerY + Math.sin(stream) * (80 + stream * 60);
-                    const endX = centerX + Math.cos(stream + Math.PI) * (100 + stream * 40);
-                    const endY = centerY + Math.sin(stream + Math.PI) * (100 + stream * 40);
-                    
-                    ctx.moveTo(startX, startY);
-                    
-                    // Add flowing curves
-                    for (let curve = 0; curve < 3; curve++) {
-                        const t = (curve + 1) / 4;
-                        const curveX = startX + (endX - startX) * t + Math.sin(stream + curve) * 40;
-                        const curveY = startY + (endY - startY) * t + Math.cos(stream + curve) * 30;
-                        ctx.quadraticCurveTo(curveX, curveY, 
-                            startX + (endX - startX) * (t + 0.25), 
-                            startY + (endY - startY) * (t + 0.25));
+                    // Swirling spiral lines
+                    for (let i = 0; i < 20; i++) {
+                        const angle = (i / 20) * Math.PI * 4; // Multiple rotations
+                        const radius = i * 3;
+                        const x = centerX + Math.cos(angle) * radius;
+                        const y = centerY + Math.sin(angle) * radius;
+                        const x2 = centerX + Math.cos(angle + 0.5) * (radius + 10);
+                        const y2 = centerY + Math.sin(angle + 0.5) * (radius + 10);
+                        svg += `<line x1="${x}" y1="${y}" x2="${x2}" y2="${y2}" stroke="${palette[swirl % palette.length]}" stroke-width="3" opacity="0.7"/>`;
                     }
-                    
-                    ctx.stroke();
                 }
-            }
-            
-            ctx.globalAlpha = 1;
-        }
-
-        function drawMoodShape(ctx, x, y, size, mood) {
-            if (mood === 'positive') {
-                drawStar(ctx, x, y, size);
-            } else if (mood === 'creative') {
-                drawSpiral(ctx, x, y, size);
-            } else if (mood === 'collaborative') {
-                drawHeart(ctx, x, y, size);
-            } else if (mood === 'challenged') {
-                drawTriangle(ctx, x, y, size);
-            } else if (mood === 'reflective') {
-                drawSquare(ctx, x, y, size);
+                
+                // Add chaotic scattered elements
+                for (let i = 0; i < intensity * 8; i++) {
+                    const x = Math.random() * width;
+                    const y = Math.random() * height;
+                    const size = 2 + Math.random() * 6;
+                    svg += `<circle cx="${x}" cy="${y}" r="${size}" fill="${palette[Math.floor(Math.random() * palette.length)]}" opacity="0.6"/>`;
+                }
+                
+            } else if (style === 'radiant') {
+                // Uplifting - Sunburst radiating from center like mood board
+                const centerX = width / 2;
+                const centerY = height / 2;
+                
+                // Create radiating sunburst
+                for (let i = 0; i < 24; i++) {
+                    const angle = (i / 24) * Math.PI * 2;
+                    const length = 40 + Math.random() * 80;
+                    const x2 = centerX + Math.cos(angle) * length;
+                    const y2 = centerY + Math.sin(angle) * length;
+                    
+                    // Varying line thickness for sun ray effect
+                    const thickness = i % 3 === 0 ? 4 : 2;
+                    svg += `<line x1="${centerX}" y1="${centerY}" x2="${x2}" y2="${y2}" stroke="${palette[0]}" stroke-width="${thickness}" opacity="0.8"/>`;
+                }
+                
+                // Central sun core with gradient effect
+                svg += `<circle cx="${centerX}" cy="${centerY}" r="25" fill="${palette[1]}" opacity="0.9"/>`;
+                svg += `<circle cx="${centerX}" cy="${centerY}" r="15" fill="${palette[2]}" opacity="0.8"/>`;
+                svg += `<circle cx="${centerX}" cy="${centerY}" r="8" fill="${palette[3]}" opacity="0.7"/>`;
+                
+            } else if (style === 'meditative') {
+                // Contemplative - Geometric mandala patterns like mood board
+                const centerX = width / 2;
+                const centerY = height / 2;
+                
+                // Create concentric geometric patterns
+                for (let ring = 1; ring <= 4; ring++) {
+                    const radius = ring * 25;
+                    const sides = ring * 6;
+                    
+                    // Draw geometric ring
+                    for (let i = 0; i < sides; i++) {
+                        const angle1 = (i / sides) * Math.PI * 2;
+                        const angle2 = ((i + 1) / sides) * Math.PI * 2;
+                        const x1 = centerX + Math.cos(angle1) * radius;
+                        const y1 = centerY + Math.sin(angle1) * radius;
+                        const x2 = centerX + Math.cos(angle2) * radius;
+                        const y2 = centerY + Math.sin(angle2) * radius;
+                        
+                        svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${palette[ring % palette.length]}" stroke-width="2" opacity="0.6"/>`;
+                        
+                        // Add geometric dots at vertices
+                        svg += `<circle cx="${x1}" cy="${y1}" r="4" fill="${palette[ring % palette.length]}" opacity="0.8"/>`;
+                    }
+                }
+                
+                // Central mandala core
+                svg += `<circle cx="${centerX}" cy="${centerY}" r="12" fill="${palette[0]}" opacity="0.8"/>`;
+                
+            } else if (style === 'jittery') {
+                // Caffeinated - Scattered chaotic energy like mood board
+                // Random scattered dots and lines mimicking caffeine jitters
+                for (let i = 0; i < intensity * 15; i++) {
+                    const x = Math.random() * width;
+                    const y = Math.random() * height;
+                    const size = 1 + Math.random() * 4;
+                    
+                    // Coffee brown dots
+                    svg += `<circle cx="${x}" cy="${y}" r="${size}" fill="${palette[0]}" opacity="0.8"/>`;
+                    
+                    // Jittery connecting lines
+                    if (Math.random() < 0.4) {
+                        const x2 = x + (Math.random() - 0.5) * 40;
+                        const y2 = y + (Math.random() - 0.5) * 40;
+                        svg += `<line x1="${x}" y1="${y}" x2="${x2}" y2="${y2}" stroke="${palette[1]}" stroke-width="1" opacity="0.6"/>`;
+                    }
+                }
+                
+                // Add coffee bean-like shapes
+                for (let i = 0; i < 6; i++) {
+                    const x = Math.random() * width;
+                    const y = Math.random() * height;
+                    svg += `<ellipse cx="${x}" cy="${y}" rx="8" ry="4" fill="${palette[0]}" opacity="0.7" transform="rotate(${Math.random() * 360} ${x} ${y})"/>`;
+                }
+                
             } else {
-                ctx.beginPath();
-                ctx.arc(x, y, size/2, 0, 2 * Math.PI);
-                ctx.fill();
+                // Default balanced flowing style
+                for (let i = 0; i < intensity * 3; i++) {
+                    const x = Math.random() * width;
+                    const y = Math.random() * height;
+                    const baseRadius = 8 + Math.random() * 20;
+                    const radius = baseRadius * (0.5 + (intensity / 20));
+                    const color = palette[Math.floor(Math.random() * palette.length)];
+                    const opacity = Math.min(0.8, 0.3 + (intensity / 15) + Math.random() * 0.3);
+                    svg += `<circle cx="${x}" cy="${y}" r="${radius}" fill="${color}" opacity="${opacity}"/>`;
+                }
             }
-        }
-
-        function drawStar(ctx, x, y, size) {
-            const spikes = 5;
-            let rot = Math.PI / 2 * 3;
-            const step = Math.PI / spikes;
             
-            ctx.beginPath();
-            ctx.moveTo(x, y - size/2);
-            for (let i = 0; i < spikes; i++) {
-                const x1 = x + Math.cos(rot) * size/2;
-                const y1 = y + Math.sin(rot) * size/2;
-                ctx.lineTo(x1, y1);
-                rot += step;
-                
-                const x2 = x + Math.cos(rot) * size/4;
-                const y2 = y + Math.sin(rot) * size/4;
-                ctx.lineTo(x2, y2);
-                rot += step;
+            svg += '</svg>';
+            return svg;
+        }
+
+        function getColorMeaning(analysis) {
+            const meanings = {
+                'triumphant': {
+                    primary: 'Green spectrum represents growth, achievement, and success',
+                    secondary: 'Darker greens add confidence and stability',
+                    pattern: 'Celebratory fireworks pattern reflects victory energy'
+                },
+                'focused': {
+                    primary: 'Blue tones represent trust, reliability, and clear thinking',
+                    secondary: 'Cool gray adds methodical, systematic approach',
+                    pattern: 'Structured grid shows organized, implementation-ready mindset'
+                },
+                'energetic': {
+                    primary: 'Orange and red express enthusiasm, passion, and high drive',
+                    secondary: 'Warm spectrum energizes and motivates action',
+                    pattern: 'Dynamic bursts mirror explosive creative energy'
+                },
+                'creative': {
+                    primary: 'Purple and pink blend imagination with innovation',
+                    secondary: 'Cyan adds fresh perspective, orange provides creative spark',
+                    pattern: 'Abstract flowing shapes represent limitless possibilities'
+                },
+                'turbulent': {
+                    primary: 'Slate gray provides disciplined backbone under pressure',
+                    secondary: 'Cool gray adds systematic persistence, red accents show intensity',
+                    pattern: 'Stormy patterns reflect managed chaos and determined grinding'
+                },
+                'tranquil': {
+                    primary: 'Blue-cyan spectrum promotes calm, clarity, and peace',
+                    secondary: 'Ocean tones create flowing, meditative energy',
+                    pattern: 'Gentle waves and bubbles mirror serene focus'
+                },
+                'uplifting': {
+                    primary: 'Yellow and amber radiate optimism and hope',
+                    secondary: 'Warm glow energizes positive thinking',
+                    pattern: 'Radiant sunburst spreads encouraging energy outward'
+                },
+                'harmonious': {
+                    primary: 'Green spectrum represents growth, collaboration, and unity',
+                    secondary: 'Natural tones foster connection and shared purpose',
+                    pattern: 'Interconnected networks show team synergy and cooperation'
+                },
+                'contemplative': {
+                    primary: 'Gray spectrum reflects wisdom, thoughtfulness, and introspection',
+                    secondary: 'Neutral tones create space for deep reflection',
+                    pattern: 'Meditative mandalas encourage centered, mindful thinking'
+                },
+                'caffeinated': {
+                    primary: 'Coffee browns provide grounded, stimulating energy',
+                    secondary: 'Cream highlights add alertness and mental sharpness',
+                    pattern: 'Jittery, scattered elements mirror rapid, energized thinking'
+                },
+                'balanced': {
+                    primary: 'Purple spectrum represents adaptability and openness',
+                    secondary: 'Flowing blend creates harmony between different energies',
+                    pattern: 'Organic shapes reflect flexible, well-rounded approach'
+                }
+            };
+            
+            return meanings[analysis.mood] || meanings['balanced'];
+        }
+
+        function addQuickMood(moodText) {
+            const textarea = document.getElementById('moodInput');
+            const currentText = textarea.value.trim();
+            if (currentText) {
+                textarea.value = currentText + ' and ' + moodText;
+            } else {
+                textarea.value = 'Feeling ' + moodText;
             }
-            ctx.closePath();
-            ctx.fill();
+            textarea.focus();
         }
 
-        function drawSpiral(ctx, x, y, size) {
-            ctx.beginPath();
-            ctx.lineWidth = 3;
-            ctx.strokeStyle = ctx.fillStyle;
-            let angle = 0;
-            ctx.moveTo(x, y);
-            for (let i = 0; i < size/2; i++) {
-                angle += 0.2;
-                const spiralX = x + Math.cos(angle) * (i * 0.8);
-                const spiralY = y + Math.sin(angle) * (i * 0.8);
-                ctx.lineTo(spiralX, spiralY);
-            }
-            ctx.stroke();
-        }
-
-        function drawHeart(ctx, x, y, size) {
-            const heartSize = size / 15;
-            ctx.beginPath();
-            ctx.moveTo(x, y + heartSize * 3);
-            ctx.bezierCurveTo(x, y + heartSize * 2, x - heartSize * 2, y, x - heartSize * 4, y + heartSize * 2);
-            ctx.bezierCurveTo(x - heartSize * 6, y + heartSize * 6, x - heartSize * 6, y + heartSize * 10, x, y + heartSize * 16);
-            ctx.bezierCurveTo(x + heartSize * 6, y + heartSize * 10, x + heartSize * 6, y + heartSize * 6, x + heartSize * 4, y + heartSize * 2);
-            ctx.bezierCurveTo(x + heartSize * 2, y, x, y + heartSize * 2, x, y + heartSize * 3);
-            ctx.fill();
-        }
-
-        function drawTriangle(ctx, x, y, size) {
-            ctx.beginPath();
-            ctx.moveTo(x, y - size/2);
-            ctx.lineTo(x - size/2, y + size/2);
-            ctx.lineTo(x + size/2, y + size/2);
-            ctx.closePath();
-            ctx.fill();
-        }
-
-        function drawSquare(ctx, x, y, size) {
-            ctx.fillRect(x - size/2, y - size/2, size, size);
-        }
-
-        function submitMood() {
-            const moodInput = document.getElementById('moodInput');
-            const text = moodInput.value.trim();
+        function generateArt() {
+            const text = document.getElementById('moodInput').value.trim();
             
             if (!text) {
-                alert('Please enter your mood first!');
+                alert('Please describe your mood first!');
                 return;
             }
 
-            if (teamSubmissions.length >= MAX_TEAM_SIZE) {
-                alert('Team capacity reached! Thank you for your interest.');
-                return;
-            }
-
-            const visual = analyzeMood(text);
+            const analysis = analyzeMood(text);
+            const artwork = createArtwork(analysis, text);
+            
             const submission = {
                 id: Date.now(),
-                name: `Person ${teamSubmissions.length + 1}`, // Generic naming
+                name: `Team Member ${teamSubmissions.length + 1}`,
                 text: text,
-                visual: visual,
+                analysis: analysis,
+                artwork: artwork,
                 timestamp: new Date().toLocaleString()
             };
 
             teamSubmissions.push(submission);
-            
-            // Save to localStorage for cross-tab sharing
-            saveSubmissions();
-            
-            moodInput.value = '';
-            updateTeamCounter();
+            updateStats();
             renderSubmissions();
-            showView('visual');
+            updateTeamWeather();
             
-            setTimeout(() => {
-                const canvas = document.getElementById('moodCanvas');
-                if (canvas) {
-                    drawVisual(visual, canvas);
-                }
-                
-                document.getElementById('successMessage').classList.remove('hidden');
-                
-                document.getElementById('analysisDisplay').innerHTML = `
-                    <div class="flex items-center mb-4">
-                        <div style="width: 24px; height: 24px; background: ${visual.colors[0]}; border-radius: 50%; margin-right: 8px;"></div>
-                        <div style="width: 24px; height: 24px; background: ${visual.colors[1]}; border-radius: 50%; margin-right: 8px;"></div>
-                        <div style="width: 24px; height: 24px; background: ${visual.colors[2]}; border-radius: 50%; margin-right: 12px;"></div>
-                        <span><strong>Detected Mood:</strong> ${visual.mood} | <strong>Intensity:</strong> ${visual.intensity}/10</span>
-                    </div>
-                    <div style="background: #f8fafc; padding: 12px; border-radius: 6px; border-left: 4px solid ${visual.colors[0]};">
-                        <p style="font-style: italic; color: #374151;">"${text}"</p>
-                    </div>
-                `;
-            }, 100);
-        }
-
-        function showView(view) {
-            const hasSubmitted = teamSubmissions.some(s => s.name !== 'Sarah M.' && s.name !== 'Marcus K.' && s.name !== 'Lisa Chen');
+            document.getElementById('successMessage').classList.remove('hidden');
+            document.getElementById('moodInput').value = '';
             
-            if ((view === 'visual' || view === 'team') && !hasSubmitted) {
-                alert('Please submit your mood first!');
-                return;
-            }
-
-            document.getElementById('submitView').classList.toggle('hidden', view !== 'submit');
-            document.getElementById('visualView').classList.toggle('hidden', view !== 'visual');
-            document.getElementById('teamView').classList.toggle('hidden', view !== 'team');
-            document.getElementById('navigation').classList.toggle('hidden', !hasSubmitted);
-
-            if (view !== 'visual') {
-                document.getElementById('successMessage').classList.add('hidden');
-            }
-
-            if (hasSubmitted) {
-                const buttons = document.querySelectorAll('.nav-btn');
-                buttons.forEach(btn => {
-                    let isActive = false;
-                    if (view === 'submit' && btn.textContent.includes('Submit')) isActive = true;
-                    if (view === 'visual' && btn.textContent.includes('Your Visual')) isActive = true;
-                    if (view === 'team' && btn.textContent.includes('Team Canvas')) isActive = true;
-                    
-                    btn.className = 'nav-btn ' + (isActive ? 'nav-active' : 'nav-inactive');
-                });
-            }
-
-            if (view === 'team') {
-                setTimeout(() => {
-                    const canvas = document.getElementById('teamCanvas');
-                    if (canvas) {
-                        drawCombinedVisual(teamSubmissions, canvas);
-                        updateTeamAnalysis();
-                    }
-                }, 100);
-            }
-        }
-
-        function updateTeamAnalysis() {
-            const moodCounts = {};
-            let totalIntensity = 0;
-
-            teamSubmissions.forEach(submission => {
-                moodCounts[submission.visual.mood] = (moodCounts[submission.visual.mood] || 0) + 1;
-                totalIntensity += submission.visual.intensity;
-            });
-
-            const avgIntensity = (totalIntensity / teamSubmissions.length).toFixed(1);
-            const topMood = Object.keys(moodCounts).reduce((a, b) => moodCounts[a] > moodCounts[b] ? a : b, 'calm');
-            const responseRate = Math.min(100, (teamSubmissions.length / MAX_TEAM_SIZE * 100)).toFixed(0);
-
-            document.getElementById('avgIntensity').textContent = avgIntensity;
-            document.getElementById('topMood').textContent = topMood;
-            document.getElementById('responseRate').textContent = responseRate + '%';
-
-            const moodBreakdown = Object.entries(moodCounts)
-                .map(([mood, count]) => `<span style="background: #f3f4f6; padding: 4px 12px; border-radius: 12px; margin-right: 8px; margin-bottom: 4px; display: inline-block;">${mood}: ${count}</span>`)
-                .join('');
-
-            document.getElementById('teamAnalysisDisplay').innerHTML = `
-                <div style="margin-bottom: 16px;">
-                    <h4 style="margin-bottom: 8px; font-weight: bold;">Mood Distribution</h4>
-                    <div style="line-height: 2;">${moodBreakdown}</div>
+            // Show navigation after first submission
+            document.getElementById('navigation').classList.remove('hidden');
+            
+            document.getElementById('artDisplay').innerHTML = `
+                <div class="art-display">
+                    <h3 style="margin-bottom: 24px; color: white;">Your Energy Transformed</h3>
+                    <div class="art-frame">
+                        ${artwork}
+                    </div>
+                    <div style="margin-top: 24px; color: white;">
+                        <div style="font-size: 20px; margin-bottom: 8px;">"${analysis.mood.charAt(0).toUpperCase() + analysis.mood.slice(1)}" Energy</div>
+                        <div style="opacity: 0.9;">Intensity: ${analysis.intensity}/10 • Style: ${analysis.style}</div>
+                        <div style="opacity: 0.7; font-size: 12px; margin-top: 8px;">Pattern: ${analysis.mood} → ${analysis.style}</div>
+                        <div style="margin-top: 16px; padding: 16px; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                            <em>"${text}"</em>
+                        </div>
+                    </div>
                 </div>
-                <div style="background: #f8fafc; padding: 16px; border-radius: 6px;">
-                    <p style="color: #374151; margin-bottom: 8px;"><strong>Team Insights:</strong></p>
-                    <p style="color: #6b7280; font-size: 14px; line-height: 1.6;">
-                        Your team shows a <strong>${topMood}</strong> dominant mood with an average energy level of <strong>${avgIntensity}/10</strong>. 
-                        ${teamSubmissions.length >= 15 ? 'High participation creates vibrant, dynamic team energy!' : 
-                          teamSubmissions.length >= 10 ? 'Good team engagement with balanced energy patterns.' :
-                          'Encourage more team members to share their mood for richer insights!'}
+            `;
+            
+            document.getElementById('analysisDisplay').innerHTML = `
+                <div style="background: #f8fafc; padding: 20px; border-radius: 8px;">
+                    <h4 style="margin-bottom: 16px; color: #374151;">Artistic Analysis</h4>
+                    <div style="margin-bottom: 12px;">
+                        <strong>Mood:</strong> <span style="text-transform: capitalize;">${analysis.mood}</span>
+                    </div>
+                    <div style="margin-bottom: 12px;">
+                        <strong>Style:</strong> <span style="text-transform: capitalize;">${analysis.style}</span>
+                    </div>
+                    <div style="margin-bottom: 12px;">
+                        <strong>Color Palette:</strong> 
+                        ${analysis.palette.map(color => `<span style="display: inline-block; width: 20px; height: 20px; background: ${color}; border-radius: 50%; margin: 0 4px; vertical-align: middle;"></span>`).join('')}
+                    </div>
+                    <div style="background: #e0f2fe; padding: 16px; border-radius: 8px; margin: 16px 0;">
+                        <h5 style="margin-bottom: 8px; color: #0277bd;">Color Psychology & Pattern Meaning</h5>
+                        <div style="font-size: 14px; line-height: 1.5; color: #01579b;">
+                            <div style="margin-bottom: 6px;"><strong>Primary:</strong> ${getColorMeaning(analysis).primary}</div>
+                            <div style="margin-bottom: 6px;"><strong>Secondary:</strong> ${getColorMeaning(analysis).secondary}</div>
+                            <div><strong>Pattern:</strong> ${getColorMeaning(analysis).pattern}</div>
+                        </div>
+                    </div>
+                    <p style="color: #6b7280; line-height: 1.6; margin-top: 16px;">
+                        This artwork reflects your emotional state through color psychology, compositional energy, and artistic style. 
+                        The ${analysis.style} approach captures the essence of your ${analysis.mood} mood with ${analysis.intensity}/10 intensity.
                     </p>
                 </div>
             `;
         }
 
+        function updateStats() {
+            document.getElementById('teamCount').textContent = teamSubmissions.length;
+            
+            if (teamSubmissions.length > 0) {
+                const avgEnergy = Math.round(teamSubmissions.reduce((sum, s) => sum + s.analysis.intensity, 0) / teamSubmissions.length);
+                document.getElementById('avgEnergy').textContent = avgEnergy;
+                
+                const moodCounts = {};
+                teamSubmissions.forEach(s => {
+                    moodCounts[s.analysis.mood] = (moodCounts[s.analysis.mood] || 0) + 1;
+                });
+                const topMood = Object.keys(moodCounts).reduce((a, b) => moodCounts[a] > moodCounts[b] ? a : b);
+                document.getElementById('topMood').textContent = topMood.charAt(0).toUpperCase() + topMood.slice(1);
+                
+                document.getElementById('streakCount').textContent = teamSubmissions.length;
+            }
+        }
+
         function renderSubmissions() {
             const submitList = document.getElementById('submissionsList');
-            const allList = document.getElementById('allSubmissionsList');
+            const recent = teamSubmissions.slice(-4).reverse();
             
-            const recentSubmissions = teamSubmissions.slice(-6).reverse();
-            const submissionHTML = recentSubmissions.map(submission => `
+            if (recent.length === 0) {
+                submitList.innerHTML = '<div style="text-align: center; color: #6b7280; padding: 20px;">No team energy shared yet!</div>';
+                return;
+            }
+            
+            submitList.innerHTML = recent.map(submission => `
                 <div class="submission">
                     <div class="flex items-center">
-                        <div class="avatar" style="background: ${submission.visual.colors[0]};">
-                            ${submission.name.charAt(0).toUpperCase()}
-                        </div>
+                        <div class="avatar">${submission.name.charAt(submission.name.length - 1)}</div>
                         <div style="flex: 1;">
                             <div class="flex items-center">
                                 <strong>${submission.name}</strong>
-                                <span class="mood-tag">${submission.visual.mood}</span>
+                                <span class="mood-tag">${submission.analysis.mood}</span>
                             </div>
                             <p style="color: #6b7280; font-size: 14px; margin-top: 4px;">${submission.text}</p>
-                            <p style="color: #9ca3af; font-size: 12px; margin-top: 4px;">${submission.timestamp}</p>
+                            <div style="margin-top: 8px;">
+                                <div style="width: 100px; height: 60px; border: 2px solid #e5e7eb; border-radius: 4px; overflow: hidden; display: inline-block;">
+                                    ${submission.artwork.replace('width="400"', 'width="96"').replace('height="300"', 'height="56"')}
+                                </div>
+                                <span style="margin-left: 12px; font-size: 12px; color: #9ca3af;">Energy: ${submission.analysis.intensity}/10</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             `).join('');
+        }
 
-            if (submitList) submitList.innerHTML = submissionHTML;
-            if (allList) allList.innerHTML = teamSubmissions.slice().reverse().map(submission => `
-                <div class="submission">
-                    <div class="flex items-center">
-                        <div class="avatar" style="background: ${submission.visual.colors[0]};">
-                            ${submission.name.charAt(0).toUpperCase()}
-                        </div>
-                        <div style="flex: 1;">
-                            <div class="flex items-center">
-                                <strong>${submission.name}</strong>
-                                <span class="mood-tag">${submission.visual.mood}</span>
-                                <div style="margin-left: auto; color: #6b7280; font-size: 12px;">
-                                    Intensity: ${submission.visual.intensity}/10
+        function updateTeamWeather() {
+            if (teamSubmissions.length === 0) return;
+            
+            const recent = teamSubmissions.slice(-3);
+            const avgIntensity = recent.reduce((sum, s) => sum + s.analysis.intensity, 0) / recent.length;
+            const dominantMoods = recent.map(s => s.analysis.mood);
+            
+            const weather = document.getElementById('teamWeather');
+            const emoji = document.getElementById('weatherEmoji');
+            const description = document.getElementById('weatherDescription');
+            const details = document.getElementById('weatherDetails');
+            
+            let weatherType, weatherDesc, weatherDetail;
+            
+            if (avgIntensity >= 8) {
+                weatherType = '⚡';
+                weatherDesc = 'High Energy Storm';
+                weatherDetail = 'Team is buzzing with intense focus and drive';
+            } else if (avgIntensity >= 6) {
+                weatherType = '☀️';
+                weatherDesc = 'Sunny Team Vibes';
+                weatherDetail = 'Positive energy and good collaboration flow';
+            } else if (avgIntensity >= 4) {
+                weatherType = '⛅';
+                weatherDesc = 'Partly Cloudy';
+                weatherDetail = 'Mixed energies, some focus areas emerging';
+            } else {
+                weatherType = '🌧️';
+                weatherDesc = 'Calm Reflection';
+                weatherDetail = 'Thoughtful, steady pace with deep work';
+            }
+            
+            if (dominantMoods.includes('harmonious') || dominantMoods.includes('collaborative')) {
+                weatherType = '🌈';
+                weatherDesc = 'Collaborative Rainbow';
+                weatherDetail = 'Perfect conditions for team synergy';
+            }
+            
+            emoji.textContent = weatherType;
+            description.textContent = weatherDesc;
+            details.textContent = weatherDetail;
+            weather.classList.remove('hidden');
+        }
+
+        function updateTeamGallery() {
+            const gallery = document.getElementById('teamGallery');
+            if (teamSubmissions.length === 0) {
+                gallery.innerHTML = '<div style="text-align: center; color: #6b7280; padding: 40px;">No artworks created yet!</div>';
+                return;
+            }
+
+            const moodColors = {
+                energetic: '#f59e0b', creative: '#8b5cf6', turbulent: '#dc2626',
+                tranquil: '#06b6d4', uplifting: '#fbbf24', harmonious: '#10b981',
+                contemplative: '#6b7280', balanced: '#6366f1', triumphant: '#10b981',
+                focused: '#3b82f6', caffeinated: '#92400e'
+            };
+
+            gallery.innerHTML = `
+                <div style="margin-bottom: 24px; text-align: center;">
+                    <h3 style="color: #1f2937;">Team Energy Collection</h3>
+                    <p style="color: #6b7280;">Featuring ${teamSubmissions.length} unique mood artworks</p>
+                </div>
+                <div class="gallery-grid">
+                    ${teamSubmissions.map(submission => {
+                        const color = moodColors[submission.analysis.mood] || '#6366f1';
+                        
+                        return `
+                            <div class="gallery-item" style="border-left-color: ${color};">
+                                <div class="flex items-center mb-4">
+                                    <div class="avatar" style="background: ${color};">${submission.name.charAt(submission.name.length - 1)}</div>
+                                    <div>
+                                        <div style="font-weight: bold;">${submission.name}</div>
+                                        <div style="font-size: 12px; color: #6b7280; text-transform: capitalize;">
+                                            ${submission.analysis.mood} • ${submission.analysis.intensity}/10
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div style="text-align: center; margin-bottom: 16px;">
+                                    <div class="art-frame" style="margin: 0;">
+                                        ${submission.artwork.replace('width="400"', 'width="250"').replace('height="300"', 'height="190"')}
+                                    </div>
+                                    <div style="margin-top: 12px; color: #9b59b6; font-size: 14px; font-weight: 500; text-transform: capitalize;">
+                                        ${submission.analysis.style} Style
+                                    </div>
+                                </div>
+                                
+                                <div style="background: #f8fafc; padding: 12px; border-radius: 6px; font-size: 13px; color: #374151; font-style: italic; text-align: center;">
+                                    "${submission.text}"
                                 </div>
                             </div>
-                            <p style="color: #6b7280; font-size: 14px; margin-top: 4px;">${submission.text}</p>
-                            <p style="color: #9ca3af; font-size: 12px; margin-top: 4px;">${submission.timestamp}</p>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
+        function updateTeamVibe() {
+            if (teamSubmissions.length === 0) return;
+            
+            const vibeDesc = document.getElementById('vibeDescription');
+            const vibeFill = document.getElementById('vibeFill');
+            const hints = document.getElementById('collaborationHints');
+            
+            const avgEnergy = teamSubmissions.reduce((sum, s) => sum + s.analysis.intensity, 0) / teamSubmissions.length;
+            const moodDistribution = {};
+            
+            teamSubmissions.forEach(s => {
+                moodDistribution[s.analysis.mood] = (moodDistribution[s.analysis.mood] || 0) + 1;
+            });
+            
+            const dominantMood = Object.keys(moodDistribution).reduce((a, b) => 
+                moodDistribution[a] > moodDistribution[b] ? a : b
+            );
+            
+            vibeDesc.textContent = `Team is feeling "${dominantMood}" with ${avgEnergy.toFixed(1)}/10 average energy`;
+            vibeFill.style.width = `${(avgEnergy / 10) * 100}%`;
+            
+            const collaborativeMembers = teamSubmissions.filter(s => 
+                s.analysis.mood === 'harmonious' || s.analysis.mood === 'collaborative'
+            );
+            
+            const energeticMembers = teamSubmissions.filter(s => 
+                s.analysis.intensity >= 7
+            );
+            
+            const reflectiveMembers = teamSubmissions.filter(s => 
+                s.analysis.mood === 'contemplative' || s.analysis.mood === 'tranquil'
+            );
+            
+            let hintText = '';
+            if (collaborativeMembers.length >= 2) {
+                hintText = `${collaborativeMembers.length} team members are in collaborative mode - perfect for group sessions!`;
+            } else if (energeticMembers.length >= 2) {
+                hintText = `High energy detected in ${energeticMembers.length} members - great for tackling challenging projects!`;
+            } else if (reflectiveMembers.length >= 2) {
+                hintText = `${reflectiveMembers.length} members in reflective mode - ideal for strategy planning or retrospectives.`;
+            }
+            
+            hints.innerHTML = hintText ? `<div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); color: #047857; padding: 12px; border-radius: 8px; font-size: 14px;">🤝 ${hintText}</div>` : '';
+        }
+
+        function showInsights() {
+            if (teamSubmissions.length === 0) {
+                document.getElementById('insightsDisplay').innerHTML = '<div style="text-align: center; color: #6b7280; padding: 40px;">Create some artworks to see insights!</div>';
+                return;
+            }
+            
+            const insights = document.getElementById('insightsDisplay');
+            
+            const moodFreq = {};
+            teamSubmissions.forEach(s => {
+                moodFreq[s.analysis.mood] = (moodFreq[s.analysis.mood] || 0) + 1;
+            });
+            
+            const avgIntensity = teamSubmissions.reduce((sum, s) => sum + s.analysis.intensity, 0) / teamSubmissions.length;
+            
+            insights.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <div style="background: #f8fafc; padding: 20px; border-radius: 12px;">
+                        <h4 style="margin-bottom: 16px; color: #374151;">📊 Mood Distribution</h4>
+                        ${Object.entries(moodFreq).map(([mood, count]) => `
+                            <div style="margin-bottom: 8px;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="text-transform: capitalize;">${mood}</span>
+                                    <span>${count}</span>
+                                </div>
+                                <div style="width: 100%; height: 6px; background: #e5e7eb; border-radius: 3px; overflow: hidden;">
+                                    <div style="width: ${(count / teamSubmissions.length) * 100}%; height: 100%; background: #667eea;"></div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div style="background: #f8fafc; padding: 20px; border-radius: 12px;">
+                        <h4 style="margin-bottom: 16px; color: #374151;">⚡ Energy Metrics</h4>
+                        <div style="margin-bottom: 12px;">
+                            <strong>Average Team Energy:</strong> ${avgIntensity.toFixed(1)}/10
+                        </div>
+                        <div style="margin-bottom: 12px;">
+                            <strong>Highest Energy:</strong> ${Math.max(...teamSubmissions.map(s => s.analysis.intensity))}/10
+                        </div>
+                        <div style="margin-bottom: 12px;">
+                            <strong>Most Energetic Style:</strong> ${teamSubmissions.reduce((max, s) => s.analysis.intensity > max.analysis.intensity ? s : max).analysis.style}
                         </div>
                     </div>
                 </div>
-            `).join('');
+                
+                <div style="background: #ecfdf5; padding: 20px; border-radius: 12px; margin-top: 20px;">
+                    <h4 style="margin-bottom: 16px; color: #047857;">💡 Team Recommendations</h4>
+                    ${generateTeamRecommendations()}
+                </div>
+            `;
         }
 
-        function showGuide() {
-            document.getElementById('guideModal').style.display = 'block';
+        function generateTeamRecommendations() {
+            if (teamSubmissions.length === 0) return '<p>No data yet!</p>';
+            
+            const avgEnergy = teamSubmissions.reduce((sum, s) => sum + s.analysis.intensity, 0) / teamSubmissions.length;
+            const moodCounts = {};
+            teamSubmissions.forEach(s => {
+                moodCounts[s.analysis.mood] = (moodCounts[s.analysis.mood] || 0) + 1;
+            });
+            
+            const recommendations = [];
+            
+            if (avgEnergy >= 7) {
+                recommendations.push('🚀 High team energy detected! Perfect time for ambitious projects or brainstorming sessions.');
+            } else if (avgEnergy <= 4) {
+                recommendations.push('🧘 Team is in a reflective state. Great for detailed work, planning, or retrospectives.');
+            }
+            
+            if (moodCounts.harmonious >= 2 || moodCounts.collaborative >= 2) {
+                recommendations.push('🤝 Multiple team members feeling collaborative - schedule those group sessions!');
+            }
+            
+            if (moodCounts.creative >= 2) {
+                recommendations.push('🎨 Creative energy is high - perfect for design reviews or solution architecture.');
+            }
+            
+            if (moodCounts.focused >= 2) {
+                recommendations.push('🎯 Team has strong focus - ideal for tackling complex implementation work.');
+            }
+            
+            if (recommendations.length === 0) {
+                recommendations.push('✨ Mixed team energy creates great balance for diverse project needs.');
+            }
+            
+            return recommendations.map(rec => `<p style="margin-bottom: 8px;">${rec}</p>`).join('');
         }
 
-        function closeGuide() {
-            document.getElementById('guideModal').style.display = 'none';
-        }
+        function showView(view) {
+            const hasSubmitted = teamSubmissions.length > 0;
+            
+            if ((view === 'team' || view === 'insights') && !hasSubmitted) {
+                alert('Please create your artwork first!');
+                return;
+            }
 
-        function downloadCanvas(canvasId) {
-            const canvas = document.getElementById(canvasId);
-            const link = document.createElement('a');
-            link.download = `${canvasId}-${new Date().toISOString().split('T')[0]}.png`;
-            link.href = canvas.toDataURL();
-            link.click();
-        }
+            document.getElementById('createView').classList.toggle('hidden', view !== 'create');
+            document.getElementById('teamView').classList.toggle('hidden', view !== 'team');
+            document.getElementById('insightsView').classList.toggle('hidden', view !== 'insights');
 
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            const modal = document.getElementById('guideModal');
-            if (event.target === modal) {
-                closeGuide();
+            if (view === 'team') {
+                updateTeamGallery();
+                updateTeamVibe();
+            } else if (view === 'insights') {
+                showInsights();
+            }
+
+            // Update nav buttons
+            if (hasSubmitted) {
+                document.querySelectorAll('.nav-btn').forEach((btn, index) => {
+                    if (index < 3) {
+                        const isActive = (view === 'create' && index === 0) || 
+                                        (view === 'team' && index === 1) || 
+                                        (view === 'insights' && index === 2);
+                        btn.className = 'nav-btn ' + (isActive ? 'nav-active' : 'nav-inactive');
+                    }
+                });
             }
         }
 
         function resetSession() {
-            if (confirm('Are you sure you want to reset all team responses? This will clear everything and start fresh.')) {
-                // Completely clear all submissions
+            if (confirm('Reset all artworks? This will clear the team gallery.')) {
                 teamSubmissions = [];
-                
-                // Save empty state to localStorage
-                saveSubmissions();
-                
-                // Update displays
-                updateTeamCounter();
+                updateStats();
                 renderSubmissions();
-                
-                // Clear individual visual canvas
-                const canvas = document.getElementById('moodCanvas');
-                if (canvas) {
-                    const ctx = canvas.getContext('2d');
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                }
-                
-                // Clear team canvas
-                const teamCanvas = document.getElementById('teamCanvas');
-                if (teamCanvas) {
-                    const ctx = teamCanvas.getContext('2d');
-                    ctx.clearRect(0, 0, teamCanvas.width, teamCanvas.height);
-                }
-                
-                // Hide navigation and success message
                 document.getElementById('navigation').classList.add('hidden');
                 document.getElementById('successMessage').classList.add('hidden');
-                
-                // Reset to submit view
-                document.getElementById('submitView').classList.remove('hidden');
-                document.getElementById('visualView').classList.add('hidden');
-                document.getElementById('teamView').classList.add('hidden');
-                
-                // Clear analysis displays
-                document.getElementById('analysisDisplay').innerHTML = '';
-                document.getElementById('teamAnalysisDisplay').innerHTML = '';
-                
-                // Clear form inputs
+                document.getElementById('teamWeather').classList.add('hidden');
+                showView('create');
                 document.getElementById('moodInput').value = '';
                 
-                alert('Session completely reset! All tabs will sync to empty state.');
+                // Reset displays
+                document.getElementById('artDisplay').innerHTML = `
+                    <p style="text-align: center; color: #6b7280; padding: 40px;">
+                        Create your first artwork to see your energy transformed into visual art!
+                    </p>
+                `;
+                
+                document.getElementById('analysisDisplay').innerHTML = `
+                    <p style="text-align: center; color: #6b7280; padding: 20px;">
+                        Analysis will appear here after creating artwork.
+                    </p>
+                `;
             }
         }
 
-        // Initialize the app
-        initializeData();
-        updateTeamCounter();
+        // Initialize
+        updateStats();
         renderSubmissions();
     </script>
 </body>
